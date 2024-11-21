@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import sequelize from './config/database';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
+import movieRoutes from './routes/movieRoutes';
 import { setupSwagger } from './config/swagger';
 import { errorHandler } from './middlewares/errorHandler';
 
@@ -25,6 +26,7 @@ class App {
   
   private initializeRoutes() {
     this.app.use('/api/auth', authRoutes);
+    this.app.use('/api/movies', movieRoutes);
     this.app.use(errorHandler);
   }
 
