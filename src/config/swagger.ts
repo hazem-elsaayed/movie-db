@@ -52,6 +52,37 @@ const options = {
             },
           },
         },
+        rating: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'integer',
+              description: 'The rating ID',
+            },
+            userId: {
+              type: 'integer',
+              description: 'The user ID',
+            },
+            movieId: {
+              type: 'integer',
+              description: 'The movie ID',
+            },
+            rating: {
+              type: 'number',
+              format: 'float',
+              description: 'The rating value',
+            },
+            user: {
+              type: 'object',
+              properties: {
+                username: {
+                  type: 'string',
+                  description: 'The username of the user',
+                },
+              },
+            },
+          },
+        }
       },
       securitySchemes: {
         bearerAuth: {
