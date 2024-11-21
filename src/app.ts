@@ -1,6 +1,9 @@
 import express, { Application } from 'express';
 import sequelize from './config/database';
 import cors from 'cors';
+import authRoutes from './routes/authRoutes';
+import { setupSwagger } from './config/swagger';
+import { errorHandler } from './middlewares/errorHandler';
 
 class App {
   public app: Application;
@@ -16,9 +19,14 @@ class App {
 
   private initializeMiddlewares() {
     this.app.use(cors());
+    this.app.use(express.json());
+    setupSwagger(this.app);
   }
-
-  private initializeRoutes() {}
+  
+  private initializeRoutes() {
+    this.app.use('/api/auth', authRoutes);
+    this.app.use(errorHandler);
+  }
 
   private async initializeDatabase() {
     await sequelize.authenticate();
