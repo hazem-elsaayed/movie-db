@@ -1,7 +1,8 @@
 
 import { MovieService } from '../src/services/movieService';
 import { Movie } from '../src/models/movie';
-import { Genre } from '../src/models/genre';
+import { Rating } from '../src/models/rating';
+import { User } from '../src/models/user';
 import { RedisCache } from '../src/utils/redisCache';
 import { CustomError } from '../src/utils/customError';
 
@@ -110,6 +111,45 @@ describe('MovieService', () => {
       expect(redisCache.get).toHaveBeenCalled();
       expect(Movie.findAll).toHaveBeenCalled();
       expect(result).toEqual(movies);
+    });
+  });
+
+  it('should create a new rating if it does not exist', async () => {
+    Rating.findOne = jest.fn().mockResolvedValue(null);
+    Rating.create = jest.fn().mockResolvedValue({});
+    movieService.updateMovieRating = jest.fn();
+
+    await movieService.rateMovie(1, 1, 8);
+
+    expect(Rating.findOne).toHaveBeenCalledWith({ where: { userId: 1, movieId: 1 } });
+    expect(Rating.create).toHaveBeenCalledWith({ userId: 1, movieId: 1, rating: 8 });
+    expect(movieService.updateMovieRating).toHaveBeenCalledWith(1);
+  });
+
+  it('should update an existing rating', async () => {
+    const existingRating = { rating: 5, save: jest.fn() };
+    Rating.findOne = jest.fn().mockResolvedValue(existingRating);
+    movieService.updateMovieRating = jest.fn();
+
+    await movieService.rateMovie(1, 1, 8);
+
+    expect(existingRating.rating).toBe(8);
+    expect(existingRating.save).toHaveBeenCalled();
+    expect(movieService.updateMovieRating).toHaveBeenCalledWith(1);
+  });
+
+  describe('getMovieRatings', () => {
+    it('should return all ratings for a movie', async () => {
+      const ratings = [{ rating: 8, user: { username: 'user1' } }];
+      Rating.findAll = jest.fn().mockResolvedValue(ratings);
+  
+      const result = await movieService.getMovieRatings(1);
+  
+      expect(Rating.findAll).toHaveBeenCalledWith({
+        where: { movieId: 1 },
+        include: [{ model: User, attributes: ['username'] }],
+      });
+      expect(result).toEqual(ratings);
     });
   });
 });

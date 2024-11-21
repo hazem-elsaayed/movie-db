@@ -6,15 +6,16 @@ import { Genre } from '../models/genre';
 import { CustomError } from '../utils/customError';
 import { MovieQuery } from '../utils/interfaces';
 import redisCache, { RedisCache } from '../utils/redisCache';
+import { Rating } from '../models/rating';
+import { User } from '../models/user';
 
 dotenv.config();
 
 export class MovieService {
-  private readonly cache: RedisCache;
   private expiresIn = Number(process.env.CACHE_EXPIRY) || 600;
 
-  constructor(cache: RedisCache = redisCache) {
-    this.cache = cache;
+  constructor(private readonly cache: RedisCache = redisCache) {
+
   }
 
   public async getMovies(query: MovieQuery) {
@@ -154,5 +155,62 @@ export class MovieService {
         { overview: { [Op.iLike]: `%${query}%` } },
       ],
     };
+  }
+
+  public async rateMovie(
+    userId: number,
+    movieId: number,
+    ratingValue: number
+  ) {
+    const existingRating = await Rating.findOne({
+      where: { userId, movieId },
+    });
+    if (existingRating) {
+      existingRating.rating = ratingValue;
+      await existingRating.save();
+    } else {
+      await Rating.create({ userId, movieId, rating: ratingValue });
+    }
+
+    await this.updateMovieRating(movieId);
+  }
+
+  public async getMovieRatings(movieId: number) {
+    return await Rating.findAll({
+      where: { movieId },
+      include: [{ model: User, attributes: ['username'] }],
+    });
+  }
+
+  public async updateMovieRating(movieId: number) {
+    const ratings = await this.getRatingsByMovieId(movieId);
+    const { averageRating, ratingCount } = this.calculateAverageRating(ratings);
+
+    await this.updateMovieWithRating(movieId, averageRating, ratingCount);
+  }
+
+  private async getRatingsByMovieId(movieId: number) {
+    const movie = await Rating.findAll({ where: { movieId } });
+    if (!movie) {
+      throw new CustomError('Movie not found', 404);
+    }
+    return movie;
+  }
+
+  private calculateAverageRating(ratings: Rating[]) {
+    const ratingCount = ratings.length;
+    const averageRating =
+      ratingCount > 0 ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratingCount : 0;
+
+    return { averageRating, ratingCount };
+  }
+
+  private async updateMovieWithRating(movieId: number, averageRating: number, ratingCount: number) {
+    const movie = await Movie.findByPk(movieId);
+    if (movie) {
+      movie.averageRating = averageRating;
+      movie.ratingCount = ratingCount;
+      await movie.save();
+    }
   }
 }

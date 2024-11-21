@@ -8,6 +8,7 @@ import {
 } from '../validators/movieValidator';
 import { validate } from '../middlewares/validate';
 import { authenticate } from '../middlewares/authMiddleware';
+import { rateMovieValidator } from '../validators/ratingValidator';
 
 const router = Router();
 const movieService = new MovieService();
@@ -141,6 +142,75 @@ router.get(
   getMovieByIdValidator,
   validate,
   movieController.getMovieById
+);
+
+/**
+ * @swagger
+ * /api/movies/{id}/rate:
+ *   post:
+ *     summary: Rate a movie
+ *     tags: [Movies]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The movie ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               rating:
+ *                 type: number
+ *                 minimum: 0
+ *                 maximum: 10
+ *     responses:
+ *       200:
+ *         description: Rating submitted successfully
+ */
+router.post(
+  '/:id/rate',
+  authenticate,
+  rateMovieValidator,
+  validate,
+  movieController.rateMovie
+);
+
+/**
+ * @swagger
+ * /api/movies/{id}/ratings:
+ *   get:
+ *     summary: Get ratings for a movie
+ *     tags: [Movies]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The movie ID
+ *     responses:
+ *       200:
+ *         description: A list of ratings
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/rating'
+ */
+router.get(
+  '/:id/ratings',
+  authenticate,
+  movieController.getMovieRatings
 );
 
 export default router;
