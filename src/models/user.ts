@@ -16,6 +16,9 @@ export class User extends Model {
     type: DataType.STRING,
     unique: true,
     allowNull: false,
+    validate: {
+      isEmail: true,
+    },
   })
   email!: string;
 
