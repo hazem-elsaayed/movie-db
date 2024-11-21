@@ -190,7 +190,11 @@ export class MovieService {
   }
 
   private async getRatingsByMovieId(movieId: number) {
-    return await Rating.findAll({ where: { movieId } });
+    const movie = await Rating.findAll({ where: { movieId } });
+    if (!movie) {
+      throw new CustomError('Movie not found', 404);
+    }
+    return movie;
   }
 
   private calculateAverageRating(ratings: Rating[]) {
