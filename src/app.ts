@@ -3,6 +3,7 @@ import sequelize from './config/database';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 import movieRoutes from './routes/movieRoutes';
+import watchlistRoutes from './routes/watchlistRoutes';
 import { setupSwagger } from './config/swagger';
 import { errorHandler } from './middlewares/errorHandler';
 
@@ -27,6 +28,7 @@ class App {
   private initializeRoutes() {
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/movies', movieRoutes);
+    this.app.use('/api/watchlist', watchlistRoutes);
     this.app.use(errorHandler);
   }
 
