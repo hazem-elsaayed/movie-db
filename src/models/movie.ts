@@ -49,6 +49,7 @@ export class Movie extends Model {
   @Default(0)
   @Column({
     type: DataType.FLOAT,
+    defaultValue: 0,
   })
   averageRating!: number;
 
