@@ -26,6 +26,7 @@ src/
 ## API Features
 - User authentication (JWT)
 - Rate limiter
+- Cronjob to update movies daily from TMDB
 - Movie management
 - Watchlist functionality
 - Rating system
