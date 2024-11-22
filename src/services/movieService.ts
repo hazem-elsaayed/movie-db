@@ -5,6 +5,7 @@ import { CustomError } from '../utils/customError.js';
 import {
   ICache,
   IMovieRepository,
+  IMovieService,
   IRatingRepository,
   MovieQuery,
 } from '../utils/interfaces.js';
@@ -12,7 +13,7 @@ import { Rating } from '../models/rating.js';
 
 dotenv.config();
 
-export class MovieService {
+export class MovieService implements IMovieService {
   constructor(
     private readonly movieRepository: IMovieRepository,
     private readonly ratingRepository: IRatingRepository,
