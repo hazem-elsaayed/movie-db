@@ -2,6 +2,12 @@ import { Router } from 'express';
 import { AuthController } from '../controllers/authController.js';
 import { registerValidator, loginValidator } from '../validators/authValidator.js';
 import { validate } from '../middlewares/validate.js';
+import { AuthRepository } from '../repositories/authRepository.js';
+import { AuthService } from '../services/authService.js';
+
+const authRepository = new AuthRepository();
+const authService = new AuthService(authRepository);
+const authController = new AuthController(authService);
 
 const router = Router();
 
@@ -41,7 +47,7 @@ const router = Router();
  *       409:
  *         description: Email already in use
  */
-router.post('/register', registerValidator, validate, AuthController.register);
+router.post('/register', registerValidator, validate, authController.register);
 
 /**
  * @swagger
@@ -82,6 +88,6 @@ router.post('/register', registerValidator, validate, AuthController.register);
  *       401:
  *         description: Invalid username/password
  */
-router.post('/login', loginValidator, validate, AuthController.login);
+router.post('/login', loginValidator, validate, authController.login);
 
 export default router;

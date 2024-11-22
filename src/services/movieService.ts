@@ -1,111 +1,45 @@
 import dotenv from 'dotenv';
-import { Op } from 'sequelize';
 
 import { Movie } from '../models/movie.js';
-import { Genre } from '../models/genre.js';
 import { CustomError } from '../utils/customError.js';
-import { MovieQuery } from '../utils/interfaces.js';
-import redisCache, { RedisCache } from '../utils/redisCache.js';
+import {
+  ICache,
+  IMovieRepository,
+  IMovieService,
+  IRatingRepository,
+  MovieQuery,
+} from '../utils/interfaces.js';
 import { Rating } from '../models/rating.js';
-import { User } from '../models/user.js';
 
 dotenv.config();
 
-export class MovieService {
-  private expiresIn = Number(process.env.CACHE_EXPIRY) || 600;
-
-  constructor(private readonly cache: RedisCache = redisCache) {
-
-  }
+export class MovieService implements IMovieService {
+  constructor(
+    private readonly movieRepository: IMovieRepository,
+    private readonly ratingRepository: IRatingRepository,
+    private readonly cache: ICache,
+    private readonly expiresIn: number = 600
+  ) {}
 
   public async getMovies(query: MovieQuery) {
-    const {
-      page = 1,
-      limit = 10,
-      sort = 'title',
-      order = 'ASC',
-      genre,
-      title,
-    } = query;
-    const offset = (page - 1) * limit;
-
-    const cacheKey = this.generateCacheKey(
-      page,
-      limit,
-      sort,
-      order,
-      genre,
-      title
-    );
+    const cacheKey = this.generateCacheKey(query);
     const cachedMovies = await this.cache.get(cacheKey);
     if (cachedMovies) {
       return cachedMovies;
     }
 
-    const whereClause = this.buildWhereClause(title);
-    const { rows: movies, count: totalElements } = await this.fetchMovies(
-      whereClause,
-      genre,
-      offset,
-      limit,
-      sort,
-      order
-    );
+    const { rows: movies, count: totalElements } =
+      await this.movieRepository.findMovies(query);
 
     const result = {
-      page: Number(page),
-      pageSize: Number(limit),
+      page: Number(query.page || 1),
+      pageSize: Number(query.limit || 10),
       totalElements,
       movies,
     };
 
     await this.cache.set(cacheKey, result, this.expiresIn);
     return result;
-  }
-
-  private generateCacheKey(
-    page: number,
-    limit: number,
-    sort: string,
-    order: string,
-    genre?: string,
-    title?: string
-  ): string {
-    return `movies_${page}_${limit}_${sort}_${order}_${genre}_${title}`;
-  }
-
-  private buildWhereClause(title?: string): { title?: string } {
-    const whereClause: { title?: string } = {};
-    if (title) {
-      whereClause.title = title;
-    }
-    return whereClause;
-  }
-
-  private async fetchMovies(
-    whereClause: { title?: string },
-    genre: string | undefined,
-    offset: number,
-    limit: number,
-    sort: string,
-    order: string
-  ) {
-    return await Movie.findAndCountAll({
-      where: whereClause,
-      include: [
-        {
-          model: Genre,
-          as: 'genres',
-          attributes: ['name'],
-          where: genre ? { name: genre } : {},
-          through: { attributes: [] },
-        },
-      ],
-      offset: offset,
-      limit: Number(limit),
-      order: [[sort, order]],
-      distinct: true,
-    });
   }
 
   public async getMovieById(id: string): Promise<Movie> {
@@ -115,11 +49,7 @@ export class MovieService {
       return cachedMovie;
     }
 
-    const movie = await Movie.findByPk(id, {
-      include: [
-        { model: Genre, attributes: ['name'], through: { attributes: [] } },
-      ],
-    });
+    const movie = await this.movieRepository.findById(id);
     if (!movie) {
       throw new CustomError('Movie not found', 404);
     }
@@ -130,31 +60,17 @@ export class MovieService {
 
   public async searchMovies(query: { q: string }): Promise<Movie[]> {
     const { q } = query;
+
     const cacheKey = `search_${q}`;
     const cachedMovies = await this.cache.get(cacheKey);
     if (cachedMovies) {
       return cachedMovies;
     }
 
-    const searchConditions = this.buildSearchConditions(q);
-    const movies = await Movie.findAll({
-      where: searchConditions,
-      include: [
-        { model: Genre, attributes: ['name'], through: { attributes: [] } },
-      ],
-    });
+    const movies = await this.movieRepository.search(q);
 
     await this.cache.set(cacheKey, movies, this.expiresIn);
     return movies;
-  }
-
-  private buildSearchConditions(query: string) {
-    return {
-      [Op.or]: [
-        { title: { [Op.iLike]: `%${query}%` } },
-        { overview: { [Op.iLike]: `%${query}%` } },
-      ],
-    };
   }
 
   public async rateMovie(
@@ -162,55 +78,56 @@ export class MovieService {
     movieId: number,
     ratingValue: number
   ) {
-    const existingRating = await Rating.findOne({
-      where: { userId, movieId },
-    });
+    const existingRating = await this.ratingRepository.findOne(
+      userId,
+      movieId
+    );
+
     if (existingRating) {
-      existingRating.rating = ratingValue;
-      await existingRating.save();
+      await this.ratingRepository.update(existingRating, ratingValue);
     } else {
-      await Rating.create({ userId, movieId, rating: ratingValue });
+      await this.ratingRepository.create(userId, movieId, ratingValue);
     }
 
     await this.updateMovieRating(movieId);
   }
 
   public async getMovieRatings(movieId: number) {
-    return await Rating.findAll({
-      where: { movieId },
-      include: [{ model: User, attributes: ['username'] }],
-    });
+    return await this.ratingRepository.findAllWithUser(movieId);
   }
 
   public async updateMovieRating(movieId: number) {
-    const ratings = await this.getRatingsByMovieId(movieId);
-    const { averageRating, ratingCount } = this.calculateAverageRating(ratings);
+    const ratings = await this.ratingRepository.findAllByMovieId(movieId);
 
-    await this.updateMovieWithRating(movieId, averageRating, ratingCount);
-  }
+    const { averageRating, ratingCount } =
+      this.calculateAverageRating(ratings);
 
-  private async getRatingsByMovieId(movieId: number) {
-    const movie = await Rating.findAll({ where: { movieId } });
-    if (!movie) {
-      throw new CustomError('Movie not found', 404);
-    }
-    return movie;
+    await this.movieRepository.updateRating(
+      movieId,
+      averageRating,
+      ratingCount
+    );
   }
 
   private calculateAverageRating(ratings: Rating[]) {
     const ratingCount = ratings.length;
     const averageRating =
-      ratingCount > 0 ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratingCount : 0;
+      ratingCount > 0
+        ? ratings.reduce((sum, rating) => sum + rating.rating, 0) / ratingCount
+        : 0;
 
     return { averageRating, ratingCount };
   }
 
-  private async updateMovieWithRating(movieId: number, averageRating: number, ratingCount: number) {
-    const movie = await Movie.findByPk(movieId);
-    if (movie) {
-      movie.averageRating = averageRating;
-      movie.ratingCount = ratingCount;
-      await movie.save();
-    }
+  private generateCacheKey(query: MovieQuery): string {
+    const {
+      page = 1,
+      limit = 10,
+      sort = 'title',
+      order = 'ASC',
+      genre,
+      title,
+    } = query;
+    return `movies_${page}_${limit}_${sort}_${order}_${genre}_${title}`;
   }
 }

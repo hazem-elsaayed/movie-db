@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "jest",
-    "test:coverage": "jest --coverage --coverageReporters=text-summary",
+    "test:coverage": "jest --coverage",
     "start": "node dist/src/app.js",
     "build": "tsc",
     "sync-database": "node dist/src/seeders/syncDatabase.js"

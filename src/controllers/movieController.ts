@@ -1,9 +1,8 @@
 import { Response, NextFunction } from 'express';
-import { MovieService } from '../services/movieService.js';
-import { AuthenticatedRequest } from '../utils/interfaces.js';
+import { AuthenticatedRequest, IMovieService } from '../utils/interfaces.js';
 
 export class MovieController {
-  constructor(private movieService: MovieService) {}
+  constructor(private movieService: IMovieService) {}
 
   public getMovies = async (
     req: AuthenticatedRequest,

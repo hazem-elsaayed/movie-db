@@ -1,9 +1,8 @@
 import { Response, NextFunction } from 'express';
-import { WatchlistService } from '../services/watchlistService.js';
-import { AuthenticatedRequest } from '../utils/interfaces.js';
+import { AuthenticatedRequest, IWatchlistService } from '../utils/interfaces.js';
 
 export class WatchlistController {
-  constructor(private readonly watchlistService: WatchlistService) {}
+  constructor(private readonly watchlistService: IWatchlistService) {}
 
   public addToWatchlist = async (
     req: AuthenticatedRequest,

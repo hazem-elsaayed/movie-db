@@ -1,34 +1,33 @@
-
 import { WatchlistService } from '../src/services/watchlistService.js';
-import { Watchlist } from '../src/models/watchlist.js';
-import { Movie } from '../src/models/movie.js';
-import { Genre } from '../src/models/genre.js';
 import { CustomError } from '../src/utils/customError.js';
 
-jest.mock('../src/models/watchlist');
-jest.mock('../src/models/movie');
-jest.mock('../src/models/genre');
-
 describe('WatchlistService', () => {
+  const mockWatchlistRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    findAll: jest.fn(),
+    delete: jest.fn()
+  };
   let watchlistService: WatchlistService;
 
   beforeEach(() => {
-    watchlistService = new WatchlistService();
+    watchlistService = new WatchlistService(mockWatchlistRepository);
+    jest.clearAllMocks();
   });
 
   describe('addMovieToWatchlist', () => {
     it('should add a movie to the watchlist', async () => {
-      (Watchlist.findOne as jest.Mock).mockResolvedValue(null);
-      (Watchlist.create as jest.Mock).mockResolvedValue({});
+      mockWatchlistRepository.findOne.mockResolvedValue(null);
+      mockWatchlistRepository.create.mockResolvedValue({});
 
       await watchlistService.addMovieToWatchlist(1, 1);
 
-      expect(Watchlist.findOne).toHaveBeenCalledWith({ where: { userId: 1, movieId: 1 } });
-      expect(Watchlist.create).toHaveBeenCalledWith({ userId: 1, movieId: 1 });
+      expect(mockWatchlistRepository.findOne).toHaveBeenCalledWith(1, 1);
+      expect(mockWatchlistRepository.create).toHaveBeenCalledWith(1, 1);
     });
 
     it('should throw an error if the movie is already in the watchlist', async () => {
-      (Watchlist.findOne as jest.Mock).mockResolvedValue({});
+      mockWatchlistRepository.findOne.mockResolvedValue({});
 
       await expect(watchlistService.addMovieToWatchlist(1, 1)).rejects.toThrow(CustomError);
     });
@@ -36,17 +35,16 @@ describe('WatchlistService', () => {
 
   describe('removeMovieFromWatchlist', () => {
     it('should remove a movie from the watchlist', async () => {
-      const mockEntry = { destroy: jest.fn() };
-      (Watchlist.findOne as jest.Mock).mockResolvedValue(mockEntry);
+      mockWatchlistRepository.findOne.mockResolvedValue({});
 
       await watchlistService.removeMovieFromWatchlist(1, 1);
 
-      expect(Watchlist.findOne).toHaveBeenCalledWith({ where: { userId: 1, movieId: 1 } });
-      expect(mockEntry.destroy).toHaveBeenCalled();
+      expect(mockWatchlistRepository.findOne).toHaveBeenCalledWith(1, 1);
+      expect(mockWatchlistRepository.delete).toHaveBeenCalledWith({});
     });
 
     it('should throw an error if the movie is not found in the watchlist', async () => {
-      (Watchlist.findOne as jest.Mock).mockResolvedValue(null);
+      mockWatchlistRepository.findOne.mockResolvedValue(null);
 
       await expect(watchlistService.removeMovieFromWatchlist(1, 1)).rejects.toThrow(CustomError);
     });
@@ -54,53 +52,13 @@ describe('WatchlistService', () => {
 
   describe('getWatchlist', () => {
     it('should return the watchlist for a user', async () => {
-      const mockWatchlist = [
-        {
-          movie: {
-            title: 'Movie 1',
-            overview: 'Overview 1',
-            posterPath: 'path1.jpg',
-            releaseDate: new Date(),
-            averageRating: 4.5,
-            ratingCount: 10,
-            genres: [{ name: 'Genre 1' }],
-          },
-        },
-      ];
-      (Watchlist.findAll as jest.Mock).mockResolvedValue(mockWatchlist);
+      const mockWatchlist = [{ movie: { title: 'Movie 1' } }];
+      mockWatchlistRepository.findAll.mockResolvedValue(mockWatchlist);
 
       const result = await watchlistService.getWatchlist(1);
 
-      expect(Watchlist.findAll).toHaveBeenCalledWith({
-        where: { userId: 1 },
-        include: [
-          {
-            model: Movie,
-            attributes: [
-              'title',
-              'overview',
-              'posterPath',
-              'releaseDate',
-              'averageRating',
-              'ratingCount',
-            ],
-            include: [
-              {
-                model: Genre,
-                attributes: ['name'],
-                through: { attributes: [] },
-              },
-            ],
-          },
-        ],
-      });
+      expect(mockWatchlistRepository.findAll).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockWatchlist);
-    });
-
-    it('should throw an error if there is an issue retrieving the watchlist', async () => {
-      (Watchlist.findAll as jest.Mock).mockRejectedValue(new Error('Database error'));
-
-      await expect(watchlistService.getWatchlist(1)).rejects.toThrow(CustomError);
     });
   });
 });

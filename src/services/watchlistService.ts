@@ -1,23 +1,27 @@
-import { Genre } from '../models/genre.js';
-import { Movie } from '../models/movie.js';
-import { Watchlist } from '../models/watchlist.js';
 import { CustomError } from '../utils/customError.js';
+import {
+  IWatchlistRepository,
+  IWatchlistService,
+} from '../utils/interfaces.js';
 
-export class WatchlistService {
+export class WatchlistService implements IWatchlistService {
+  constructor(private watchlistRepository: IWatchlistRepository) {}
+
   public async addMovieToWatchlist(
     userId: number,
     movieId: number
   ): Promise<void> {
     try {
-      const existingEntry = await Watchlist.findOne({
-        where: { userId, movieId },
-      });
+      const existingEntry = await this.watchlistRepository.findOne(
+        userId,
+        movieId
+      );
       if (existingEntry) {
         throw new CustomError('Movie already in watchlist', 400);
       }
-      await Watchlist.create({ userId, movieId });
+      await this.watchlistRepository.create(userId, movieId);
     } catch (error) {
-      console.error('Error adding movie to watchlist:', error);
+      // console.error('Error adding movie to watchlist:', error);
       throw new CustomError('Failed to add movie to watchlist', 500);
     }
   }
@@ -27,44 +31,22 @@ export class WatchlistService {
     movieId: number
   ): Promise<void> {
     try {
-      const entry = await Watchlist.findOne({ where: { userId, movieId } });
+      const entry = await this.watchlistRepository.findOne(userId, movieId);
       if (!entry) {
         throw new CustomError('Movie not found in watchlist', 404);
       }
-      await entry.destroy();
+      await this.watchlistRepository.delete(entry);
     } catch (error) {
-      console.error('Error removing movie from watchlist:', error);
+      // console.error('Error removing movie from watchlist:', error);
       throw new CustomError('Failed to remove movie from watchlist', 500);
     }
   }
 
-  public async getWatchlist(userId: number): Promise<Watchlist[]> {
+  public async getWatchlist(userId: number) {
     try {
-      return await Watchlist.findAll({
-        where: { userId },
-        include: [
-          {
-            model: Movie,
-            attributes: [
-              'title',
-              'overview',
-              'posterPath',
-              'releaseDate',
-              'averageRating',
-              'ratingCount',
-            ],
-            include: [
-              {
-                model: Genre,
-                attributes: ['name'],
-                through: { attributes: [] },
-              },
-            ],
-          },
-        ],
-      });
+      return await this.watchlistRepository.findAll(userId);
     } catch (error) {
-      console.error('Error retrieving watchlist:', error);
+      // console.error('Error retrieving watchlist:', error);
       throw new CustomError('Failed to retrieve watchlist', 500);
     }
   }
