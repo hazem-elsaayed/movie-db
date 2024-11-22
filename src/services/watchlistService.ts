@@ -1,7 +1,10 @@
 import { CustomError } from '../utils/customError.js';
-import { IWatchlistRepository } from '../utils/interfaces.js';
+import {
+  IWatchlistRepository,
+  IWatchlistService,
+} from '../utils/interfaces.js';
 
-export class WatchlistService {
+export class WatchlistService implements IWatchlistService {
   constructor(private watchlistRepository: IWatchlistRepository) {}
 
   public async addMovieToWatchlist(
