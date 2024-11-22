@@ -1,9 +1,9 @@
 
-import { WatchlistService } from '../src/services/watchlistService';
-import { Watchlist } from '../src/models/watchlist';
-import { Movie } from '../src/models/movie';
-import { Genre } from '../src/models/genre';
-import { CustomError } from '../src/utils/customError';
+import { WatchlistService } from '../src/services/watchlistService.js';
+import { Watchlist } from '../src/models/watchlist.js';
+import { Movie } from '../src/models/movie.js';
+import { Genre } from '../src/models/genre.js';
+import { CustomError } from '../src/utils/customError.js';
 
 jest.mock('../src/models/watchlist');
 jest.mock('../src/models/movie');

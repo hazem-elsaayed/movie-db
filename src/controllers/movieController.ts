@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
-import { MovieService } from '../services/movieService';
-import { AuthenticatedRequest } from '../utils/interfaces';
+import { MovieService } from '../services/movieService.js';
+import { AuthenticatedRequest } from '../utils/interfaces.js';
 
 export class MovieController {
   constructor(private movieService: MovieService) {}

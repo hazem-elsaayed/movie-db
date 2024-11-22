@@ -1,10 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
-import { Movie } from '../models/movie';
-import { User } from '../models/user';
-import { Rating } from '../models/rating';
-import { Watchlist } from '../models/watchlist';
-import { Genre } from '../models/genre';
-import { MovieGenre } from '../models/movieGenre';
+import { Movie, User, Rating, Watchlist, Genre, MovieGenre } from '../models/index.js';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

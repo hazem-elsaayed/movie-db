@@ -1,11 +1,14 @@
-
 import { createClient } from 'redis';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export class RedisCache {
   private client;
 
   constructor() {
-    this.client = createClient();
+    this.client = createClient({
+      url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    });
     this.client.connect();
   }
 

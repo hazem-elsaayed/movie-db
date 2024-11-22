@@ -1,19 +1,20 @@
 import express, { Application } from 'express';
-import sequelize from './config/database';
+import sequelize from './config/database.js';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes';
-import movieRoutes from './routes/movieRoutes';
-import watchlistRoutes from './routes/watchlistRoutes';
-import { setupSwagger } from './config/swagger';
-import { errorHandler } from './middlewares/errorHandler';
+import authRoutes from './routes/authRoutes.js';
+import movieRoutes from './routes/movieRoutes.js';
+import watchlistRoutes from './routes/watchlistRoutes.js';
+import { setupSwagger } from './config/swagger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 class App {
   public app: Application;
-  public port: number;
 
-  constructor(port: number = 8080) {
+  constructor(private port: number = 8080) {
     this.app = express();
-    this.port = port;
     this.initializeMiddlewares();
     this.initializeRoutes();
     this.initializeDatabase();

@@ -5,8 +5,8 @@ import {
   DataType,
   BelongsToMany,
 } from 'sequelize-typescript';
-import { Movie } from './movie';
-import { MovieGenre } from './movieGenre';
+import { Movie } from './movie.js';
+import { MovieGenre } from './movieGenre.js';
 
 @Table({ tableName: 'genres', timestamps: true })
 export class Genre extends Model {

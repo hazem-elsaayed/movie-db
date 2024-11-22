@@ -6,9 +6,9 @@ import {
   HasMany,
   BelongsToMany,
 } from 'sequelize-typescript';
-import { Rating } from './rating';
-import { Movie } from './movie';
-import { Watchlist } from './watchlist';
+import { Rating } from './rating.js';
+import { Movie } from './movie.js';
+import { Watchlist } from './watchlist.js';
 
 @Table({ tableName: 'users', timestamps: true })
 export class User extends Model {
