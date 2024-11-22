@@ -68,5 +68,32 @@ export interface IAuthRepository {
 
 export interface ICache {
   get(key: string): Promise<any | null>;
-  set(key: string, value: any, expiresIn: Number): Promise<void>;
+  set(key: string, value: any, expiresIn: number): Promise<void>;
+}
+
+export interface IAuthService {
+  register(email: string, password: string, username: string): Promise<Omit<IUser, 'password'>>;
+  login(email: string, password: string): Promise<{ user: Omit<IUser, 'password'>; token: string }>;
+}
+
+export interface GetMoviesResult {
+  page: number;
+  pageSize: number;
+  totalElements: number;
+  movies: Movie[];
+}
+
+export interface IMovieService {
+  getMovies(query: MovieQuery): Promise<GetMoviesResult>;
+  getMovieById(id: string): Promise<Movie>;
+  searchMovies(query: { q: string }): Promise<Movie[]>;
+  rateMovie(userId: number, movieId: number, ratingValue: number): Promise<void>;
+  getMovieRatings(movieId: number): Promise<Rating[]>;
+  updateMovieRating(movieId: number): Promise<void>;
+}
+
+export interface IWatchlistService {
+  addMovieToWatchlist(userId: number, movieId: number): Promise<void>;
+  removeMovieFromWatchlist(userId: number, movieId: number): Promise<void>;
+  getWatchlist(userId: number): Promise<Watchlist[]>;
 }
