@@ -21,7 +21,6 @@ export class WatchlistService implements IWatchlistService {
       }
       await this.watchlistRepository.create(userId, movieId);
     } catch (error) {
-      // console.error('Error adding movie to watchlist:', error);
       throw new CustomError('Failed to add movie to watchlist', 500);
     }
   }
@@ -37,7 +36,6 @@ export class WatchlistService implements IWatchlistService {
       }
       await this.watchlistRepository.delete(entry);
     } catch (error) {
-      // console.error('Error removing movie from watchlist:', error);
       throw new CustomError('Failed to remove movie from watchlist', 500);
     }
   }
@@ -46,7 +44,6 @@ export class WatchlistService implements IWatchlistService {
     try {
       return await this.watchlistRepository.findAll(userId);
     } catch (error) {
-      // console.error('Error retrieving watchlist:', error);
       throw new CustomError('Failed to retrieve watchlist', 500);
     }
   }
