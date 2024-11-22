@@ -1,33 +1,37 @@
-import { User } from '../models/user.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { IAuthRepository } from '../utils/interfaces.js';
 import { CustomError } from '../utils/customError.js';
 
 export class AuthService {
+  constructor(private authRepository: IAuthRepository) {}
+
   public async register(email: string, password: string, username: string) {
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await this.authRepository.findByEmail(email);
     if (existingUser) {
-      throw new CustomError('Email already in use', 409);
+      throw new CustomError('Email already exists', 400);
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
+    const user = await this.authRepository.createUser(
       email,
-      password: hashedPassword,
-      username,
-    });
-    const { password: _, id, ...userWithoutPasswordAndId } = user.toJSON();
-    return userWithoutPasswordAndId;
+      hashedPassword,
+      username
+    );
+
+    const { password: _, ...userWithoutPassword } = user.toJSON();
+    return userWithoutPassword;
   }
 
   public async login(email: string, password: string) {
-    const user = await User.findOne({ where: { email } });
+    const user = await this.authRepository.findByEmail(email);
     if (!user) {
-      throw new CustomError('Invalid username/password', 401);
+      throw new CustomError('Invalid credentials', 401);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new CustomError('Invalid username/password', 401);
+      throw new CustomError('Invalid credentials', 401);
     }
 
     const token = jwt.sign(
@@ -36,16 +40,7 @@ export class AuthService {
       { expiresIn: '1h' }
     );
 
-    const { password: _, id, ...userWithoutPasswordAndId } = user.toJSON();
-    return { user: userWithoutPasswordAndId, token };
-  }
-
-  public validateToken(token: string) {
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-      return decoded;
-    } catch (error) {
-      throw new CustomError('Invalid token', 401);
-    }
+    const { password: _, ...userWithoutPassword } = user.toJSON();
+    return { user: userWithoutPassword, token };
   }
 }
