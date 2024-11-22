@@ -92,27 +92,4 @@ export class TMDBService {
       throw error;
     }
   }
-
-  async searchMovies(
-    query: string,
-    page: number = 1
-  ): Promise<{
-    results: Movie[];
-    total_results: number;
-    total_pages: number;
-    page: number;
-  }> {
-    try {
-      const response = await this.api.get('/search/movie', {
-        params: {
-          query,
-          page,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error searching movies:', error);
-      throw error;
-    }
-  }
 }
