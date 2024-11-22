@@ -1,10 +1,10 @@
 
-import { MovieService } from '../src/services/movieService';
-import { Movie } from '../src/models/movie';
-import { Rating } from '../src/models/rating';
-import { User } from '../src/models/user';
-import { RedisCache } from '../src/utils/redisCache';
-import { CustomError } from '../src/utils/customError';
+import { MovieService } from '../src/services/movieService.js';
+import { Movie } from '../src/models/movie.js';
+import { Rating } from '../src/models/rating.js';
+import { User } from '../src/models/user.js';
+import { RedisCache } from '../src/utils/redisCache.js';
+import { CustomError } from '../src/utils/customError.js';
 
 jest.mock('../src/models/movie');
 jest.mock('../src/models/genre');

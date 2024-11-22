@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { Movie } from '../models/movie';
-import { Genre } from '../models/genre';
-import sequelize from '../config/database';
+import { Movie } from '../models/movie.js';
+import { Genre } from '../models/genre.js';
+import sequelize from '../config/database.js';
 
 export class TMDBService {
   private api: AxiosInstance;

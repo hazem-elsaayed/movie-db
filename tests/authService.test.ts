@@ -1,12 +1,12 @@
 
-import { AuthService } from '../src/services/authService';
-import { User } from '../src/models/user';
-import bcrypt from 'bcrypt';
+import { AuthService } from '../src/services/authService.js';
+import { User } from '../src/models/user.js';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { CustomError } from '../src/utils/customError';
+import { CustomError } from '../src/utils/customError.js';
 
 jest.mock('../src/models/user');
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 
 describe('AuthService', () => {

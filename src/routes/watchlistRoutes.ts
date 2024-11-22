@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { WatchlistController } from '../controllers/watchlistController';
-import { WatchlistService } from '../services/watchlistService';
-import { addToWatchlistValidator, removeFromWatchlistValidator } from '../validators/watchlistValidator';
-import { validate } from '../middlewares/validate';
-import { authenticate } from '../middlewares/authMiddleware';
+import { WatchlistController } from '../controllers/watchlistController.js';
+import { WatchlistService } from '../services/watchlistService.js';
+import { addToWatchlistValidator, removeFromWatchlistValidator } from '../validators/watchlistValidator.js';
+import { validate } from '../middlewares/validate.js';
+import { authenticate } from '../middlewares/authMiddleware.js';
 
 const router = Router();
 const watchlistService = new WatchlistService();

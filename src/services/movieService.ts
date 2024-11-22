@@ -1,13 +1,13 @@
 import dotenv from 'dotenv';
 import { Op } from 'sequelize';
 
-import { Movie } from '../models/movie';
-import { Genre } from '../models/genre';
-import { CustomError } from '../utils/customError';
-import { MovieQuery } from '../utils/interfaces';
-import redisCache, { RedisCache } from '../utils/redisCache';
-import { Rating } from '../models/rating';
-import { User } from '../models/user';
+import { Movie } from '../models/movie.js';
+import { Genre } from '../models/genre.js';
+import { CustomError } from '../utils/customError.js';
+import { MovieQuery } from '../utils/interfaces.js';
+import redisCache, { RedisCache } from '../utils/redisCache.js';
+import { Rating } from '../models/rating.js';
+import { User } from '../models/user.js';
 
 dotenv.config();
 

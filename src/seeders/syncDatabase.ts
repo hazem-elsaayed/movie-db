@@ -1,5 +1,5 @@
-import { TMDBService } from '../services/tmdbService';
-import sequelize from '../config/database';
+import { TMDBService } from '../services/tmdbService.js';
+import sequelize from '../config/database.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

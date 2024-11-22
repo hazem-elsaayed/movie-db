@@ -6,8 +6,9 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
-import { Movie } from './movie';
-import { User } from './user';
+import { Movie } from './movie.js';
+import { User } from './user.js';
+import { IMovie, IUser } from '../utils/interfaces.js';
 
 @Table({ tableName: 'ratings', timestamps: true })
 export class Rating extends Model {
@@ -36,8 +37,8 @@ export class Rating extends Model {
   rating!: number;
 
   @BelongsTo(() => User)
-  user!: User;
+  user!: IUser;
 
   @BelongsTo(() => Movie)
-  movie!: Movie;
+  movie!: IMovie;
 }

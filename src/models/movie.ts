@@ -7,11 +7,11 @@ import {
   BelongsToMany,
   Default,
 } from 'sequelize-typescript';
-import { Rating } from './rating';
-import { User } from './user';
-import { Watchlist } from './watchlist';
-import { Genre } from './genre';
-import { MovieGenre } from './movieGenre';
+import { Rating } from './rating.js';
+import { User } from './user.js';
+import { Watchlist } from './watchlist.js';
+import { Genre } from './genre.js';
+import { MovieGenre } from './movieGenre.js';
 
 @Table({ tableName: 'movies', timestamps: true })
 export class Movie extends Model {

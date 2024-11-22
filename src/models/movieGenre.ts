@@ -5,8 +5,8 @@ import {
   DataType,
   ForeignKey,
 } from 'sequelize-typescript';
-import { Movie } from './movie';
-import { Genre } from './genre';
+import { Movie } from './movie.js';
+import { Genre } from './genre.js';
 
 @Table({ tableName: 'movie_genres', timestamps: true })
 export class MovieGenre extends Model {

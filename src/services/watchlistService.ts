@@ -1,7 +1,7 @@
-import { Genre } from '../models/genre';
-import { Movie } from '../models/movie';
-import { Watchlist } from '../models/watchlist';
-import { CustomError } from '../utils/customError';
+import { Genre } from '../models/genre.js';
+import { Movie } from '../models/movie.js';
+import { Watchlist } from '../models/watchlist.js';
+import { CustomError } from '../utils/customError.js';
 
 export class WatchlistService {
   public async addMovieToWatchlist(

@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { MovieController } from '../controllers/movieController';
-import { MovieService } from '../services/movieService';
+import { MovieController } from '../controllers/movieController.js';
+import { MovieService } from '../services/movieService.js';
 import {
   getMoviesValidator,
   getMovieByIdValidator,
   searchMoviesValidator,
-} from '../validators/movieValidator';
-import { validate } from '../middlewares/validate';
-import { authenticate } from '../middlewares/authMiddleware';
-import { rateMovieValidator } from '../validators/ratingValidator';
+} from '../validators/movieValidator.js';
+import { validate } from '../middlewares/validate.js';
+import { authenticate } from '../middlewares/authMiddleware.js';
+import { rateMovieValidator } from '../validators/ratingValidator.js';
 
 const router = Router();
 const movieService = new MovieService();

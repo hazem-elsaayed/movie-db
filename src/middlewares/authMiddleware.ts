@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { CustomError } from '../utils/customError';
-import { AuthenticatedRequest } from '../utils/interfaces';
+import { CustomError } from '../utils/customError.js';
+import { AuthenticatedRequest } from '../utils/interfaces.js';
 
 export const authenticate = (
   req: AuthenticatedRequest,
