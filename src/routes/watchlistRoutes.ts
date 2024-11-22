@@ -4,9 +4,11 @@ import { WatchlistService } from '../services/watchlistService.js';
 import { addToWatchlistValidator, removeFromWatchlistValidator } from '../validators/watchlistValidator.js';
 import { validate } from '../middlewares/validate.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
+import { WatchlistRepository } from '../repositories/watchlistRepository.js';
 
 const router = Router();
-const watchlistService = new WatchlistService();
+const watchlistRepository = new WatchlistRepository();
+const watchlistService = new WatchlistService(watchlistRepository);
 const watchlistController = new WatchlistController(watchlistService);
 
 /**
