@@ -8,6 +8,7 @@ import { setupSwagger } from './config/swagger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import dotenv from 'dotenv';
 import limiter from './middlewares/rateLimiter.js';
+import './cron/syncDatabaseCron.js';
 
 dotenv.config();
 
