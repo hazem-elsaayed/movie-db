@@ -8,7 +8,14 @@ import {
 import { Movie } from './movie.js';
 import { Genre } from './genre.js';
 
-@Table({ tableName: 'movie_genres', timestamps: true })
+@Table({
+  tableName: 'movie_genres',
+  timestamps: true,
+  indexes: [
+    { fields: ['movieId', 'genreId'], unique: true },
+    { fields: ['genreId'] },
+  ],
+})
 export class MovieGenre extends Model {
   @ForeignKey(() => Movie)
   @Column({
