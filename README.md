@@ -25,6 +25,7 @@ src/
 
 ## API Features
 - User authentication (JWT)
+- Rate limiter
 - Movie management
 - Watchlist functionality
 - Rating system
