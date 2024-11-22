@@ -9,9 +9,15 @@ import {
 import { validate } from '../middlewares/validate.js';
 import { authenticate } from '../middlewares/authMiddleware.js';
 import { rateMovieValidator } from '../validators/ratingValidator.js';
+import { MovieRepository } from '../repositories/movieRepository.js';
+import { RatingRepository } from '../repositories/ratingRepository.js';
+import { RedisCache } from '../utils/redisCache.js';
 
 const router = Router();
-const movieService = new MovieService();
+const movieRepository = new MovieRepository();
+const ratingRepository = new RatingRepository();
+const chache = new RedisCache();
+const movieService = new MovieService(movieRepository, ratingRepository, chache);
 const movieController = new MovieController(movieService);
 
 /**
