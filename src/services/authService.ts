@@ -1,9 +1,9 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { IAuthRepository } from '../utils/interfaces.js';
+import { IAuthRepository, IAuthService } from '../utils/interfaces.js';
 import { CustomError } from '../utils/customError.js';
 
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(private authRepository: IAuthRepository) {}
 
   public async register(email: string, password: string, username: string) {
