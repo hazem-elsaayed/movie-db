@@ -13,7 +13,14 @@ import { Watchlist } from './watchlist.js';
 import { Genre } from './genre.js';
 import { MovieGenre } from './movieGenre.js';
 
-@Table({ tableName: 'movies', timestamps: true })
+@Table({
+  tableName: 'movies',
+  timestamps: true,
+  indexes: [
+    { fields: ['title'] },
+    { fields: ['averageRating'] },
+  ],
+})
 export class Movie extends Model {
   @Column({
     type: DataType.INTEGER,

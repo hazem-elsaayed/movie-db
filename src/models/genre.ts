@@ -8,7 +8,13 @@ import {
 import { Movie } from './movie.js';
 import { MovieGenre } from './movieGenre.js';
 
-@Table({ tableName: 'genres', timestamps: true })
+@Table({ 
+  tableName: 'genres', 
+  timestamps: true,
+  indexes: [
+    { fields: ['name'] }
+  ] 
+})
 export class Genre extends Model {
   @Column({
     type: DataType.INTEGER,

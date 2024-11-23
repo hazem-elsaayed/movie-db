@@ -7,6 +7,8 @@ import watchlistRoutes from './routes/watchlistRoutes.js';
 import { setupSwagger } from './config/swagger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import dotenv from 'dotenv';
+import limiter from './middlewares/rateLimiter.js';
+import './cron/syncDatabaseCron.js';
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ class App {
   private initializeMiddlewares() {
     this.app.use(cors());
     this.app.use(express.json());
+    this.app.use(limiter);
     setupSwagger(this.app);
   }
   

@@ -67,8 +67,10 @@ export interface IAuthRepository {
 }
 
 export interface ICache {
-  get(key: string): Promise<any | null>;
-  set(key: string, value: any, expiresIn: number): Promise<void>;
+  get(key: string): Promise<any>;
+  set(key: string, value: any, expiresIn?: number): Promise<void>;
+  del(key: string): Promise<void>;
+  delPattern(pattern: string): Promise<void>;
 }
 
 export interface IAuthService {

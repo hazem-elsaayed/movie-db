@@ -4,13 +4,16 @@ import {
   Model,
   DataType,
   ForeignKey,
-  BelongsTo
+  BelongsTo,
 } from 'sequelize-typescript';
 import { Movie } from './movie.js';
 import { User } from './user.js';
 import { IMovie, IUser } from '../utils/interfaces.js';
 
-@Table({ tableName: 'watchlist' })
+@Table({
+  tableName: 'watchlist',
+  indexes: [{ fields: ['userId', 'movieId'], unique: true }],
+})
 export class Watchlist extends Model {
   @ForeignKey(() => User)
   @Column({

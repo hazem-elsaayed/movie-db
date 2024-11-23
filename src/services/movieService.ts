@@ -90,6 +90,7 @@ export class MovieService implements IMovieService {
     }
 
     await this.updateMovieRating(movieId);
+    await this.invalidateMovieCache(movieId);
   }
 
   public async getMovieRatings(movieId: number) {
@@ -107,6 +108,7 @@ export class MovieService implements IMovieService {
       averageRating,
       ratingCount
     );
+    await this.invalidateMovieCache(movieId);
   }
 
   private calculateAverageRating(ratings: Rating[]) {
@@ -129,5 +131,11 @@ export class MovieService implements IMovieService {
       title,
     } = query;
     return `movies_${page}_${limit}_${sort}_${order}_${genre}_${title}`;
+  }
+
+  private async invalidateMovieCache(movieId: number) {
+    await this.cache.del(`movie_${movieId}`);
+    await this.cache.delPattern('movies_*');
+    await this.cache.delPattern('search_*');
   }
 }

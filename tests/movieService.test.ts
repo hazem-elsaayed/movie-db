@@ -19,7 +19,9 @@ describe('MovieService', () => {
 
   const mockCache = {
     get: jest.fn(),
-    set: jest.fn()
+    set: jest.fn(),
+    del: jest.fn(),
+    delPattern: jest.fn()
   };
 
   const movieService = new MovieService(mockMovieRepository, mockRatingRepository, mockCache);

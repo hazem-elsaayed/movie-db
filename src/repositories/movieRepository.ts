@@ -22,6 +22,15 @@ export class MovieRepository implements IMovieRepository {
 
     return await Movie.findAndCountAll({
       where: whereClause,
+      attributes: [
+        'id',
+        'title',
+        'overview',
+        'posterPath',
+        'releaseDate',
+        'averageRating',
+        'ratingCount',
+      ],
       include: [
         {
           model: Genre,
@@ -40,6 +49,15 @@ export class MovieRepository implements IMovieRepository {
 
   async findById(id: string): Promise<Movie | null> {
     return await Movie.findByPk(id, {
+      attributes: [
+        'id',
+        'title',
+        'overview',
+        'posterPath',
+        'releaseDate',
+        'averageRating',
+        'ratingCount',
+      ],
       include: [
         { model: Genre, attributes: ['name'], through: { attributes: [] } },
       ],

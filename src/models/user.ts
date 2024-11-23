@@ -10,7 +10,11 @@ import { Rating } from './rating.js';
 import { Movie } from './movie.js';
 import { Watchlist } from './watchlist.js';
 
-@Table({ tableName: 'users', timestamps: true })
+@Table({
+  tableName: 'users',
+  timestamps: true,
+  indexes: [{ fields: ['email'], unique: true }],
+})
 export class User extends Model {
   @Column({
     type: DataType.STRING,

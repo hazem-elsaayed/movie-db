@@ -10,7 +10,14 @@ import { Movie } from './movie.js';
 import { User } from './user.js';
 import { IMovie, IUser } from '../utils/interfaces.js';
 
-@Table({ tableName: 'ratings', timestamps: true })
+@Table({
+  tableName: 'ratings',
+  timestamps: true,
+  indexes: [
+    { fields: ['movieId'] },
+    { fields: ['userId', 'movieId'], unique: true },
+  ],
+})
 export class Rating extends Model {
   @ForeignKey(() => User)
   @Column({
